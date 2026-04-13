@@ -1,13 +1,36 @@
 package com.innkeeper.api.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@CheckDatesValid
 public class BookingDTO {
     private Long id;
+    @NotBlank(message = "Guest name is required")
     private String guestName;
+    @NotBlank(message = "Room number is required")
     private String roomNumber;
+    @NotNull(message = "Check-in date is required")
+    @FutureOrPresent(message = "Check-in date cannot be in the past")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate checkInDate;
+    @NotNull(message = "Check-out date is required")
+    @Future(message = "Check-out date must be in the future")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate checkOutDate;
     private LocalDateTime createdAt;
 
