@@ -18,7 +18,11 @@ public class BookingDTO {
     private Long id;
     @NotBlank(message = "Guest name is required")
     private String guestName;
-    @NotBlank(message = "Room number is required")
+    @NotNull(message = "Hotel is required")
+    private Long hotelId;
+    private String hotelName;
+    @NotNull(message = "Room is required")
+    private Long roomId;
     private String roomNumber;
     @NotNull(message = "Check-in date is required")
     @FutureOrPresent(message = "Check-in date cannot be in the past")
@@ -37,15 +41,6 @@ public class BookingDTO {
     public BookingDTO() {
     }
 
-    public BookingDTO(Long id, String guestName, String roomNumber, LocalDate checkInDate, LocalDate checkOutDate, LocalDateTime createdAt) {
-        this.id = id;
-        this.guestName = guestName;
-        this.roomNumber = roomNumber;
-        this.checkInDate = checkInDate;
-        this.checkOutDate = checkOutDate;
-        this.createdAt = createdAt;
-    }
-
     public Long getId() {
         return id;
     }
@@ -60,6 +55,30 @@ public class BookingDTO {
 
     public void setGuestName(String guestName) {
         this.guestName = guestName;
+    }
+
+    public Long getHotelId() {
+        return hotelId;
+    }
+
+    public void setHotelId(Long hotelId) {
+        this.hotelId = hotelId;
+    }
+
+    public String getHotelName() {
+        return hotelName;
+    }
+
+    public void setHotelName(String hotelName) {
+        this.hotelName = hotelName;
+    }
+
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
     }
 
     public String getRoomNumber() {

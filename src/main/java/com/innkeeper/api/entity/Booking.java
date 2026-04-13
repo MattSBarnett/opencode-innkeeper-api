@@ -14,8 +14,13 @@ public class Booking {
     @Column(nullable = false)
     private String guestName;
 
-    @Column(nullable = false)
-    private String roomNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hotel_id", nullable = false)
+    private Hotel hotel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
 
     @Column(nullable = false)
     private LocalDate checkInDate;
@@ -50,12 +55,20 @@ public class Booking {
         this.guestName = guestName;
     }
 
-    public String getRoomNumber() {
-        return roomNumber;
+    public Hotel getHotel() {
+        return hotel;
     }
 
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
+    public void setHotel(Hotel hotel) {
+        this.hotel = hotel;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
     }
 
     public LocalDate getCheckInDate() {

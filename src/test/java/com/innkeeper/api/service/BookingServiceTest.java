@@ -2,7 +2,11 @@ package com.innkeeper.api.service;
 
 import com.innkeeper.api.dto.BookingDTO;
 import com.innkeeper.api.entity.Booking;
+import com.innkeeper.api.entity.Hotel;
+import com.innkeeper.api.entity.Room;
 import com.innkeeper.api.repository.BookingRepository;
+import com.innkeeper.api.repository.HotelRepository;
+import com.innkeeper.api.repository.RoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -25,10 +29,26 @@ class BookingServiceTest {
     @Mock
     private BookingRepository bookingRepository;
 
+    @Mock
+    private HotelRepository hotelRepository;
+
+    @Mock
+    private RoomRepository roomRepository;
+
+    private Hotel testHotel;
+    private Room testRoom;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        bookingService = new BookingService(bookingRepository);
+        bookingService = new BookingService(bookingRepository, hotelRepository, roomRepository);
+        
+        testHotel = new Hotel("Test Hotel", "123 Test St");
+        testHotel.setId(1L);
+        
+        testRoom = new Room("101");
+        testRoom.setId(1L);
+        testRoom.setHotel(testHotel);
     }
 
     @Test
@@ -40,13 +60,8 @@ class BookingServiceTest {
 
     @Test
     void getAllBookings_returnsBookingsList() {
-        Booking booking = new Booking();
-        booking.setId(1L);
-        booking.setGuestName("John Doe");
-        booking.setRoomNumber("101");
-        booking.setCheckInDate(LocalDate.now());
-        booking.setCheckOutDate(LocalDate.now().plusDays(1));
-
+        Booking booking = createTestBooking();
+        
         when(bookingRepository.findAll()).thenReturn(Arrays.asList(booking));
         List<BookingDTO> result = bookingService.getAllBookings();
 
@@ -56,13 +71,8 @@ class BookingServiceTest {
 
     @Test
     void getBookingById_existingBooking_returnsDTO() {
-        Booking booking = new Booking();
-        booking.setId(1L);
-        booking.setGuestName("John Doe");
-        booking.setRoomNumber("101");
-        booking.setCheckInDate(LocalDate.now());
-        booking.setCheckOutDate(LocalDate.now().plusDays(1));
-
+        Booking booking = createTestBooking();
+        
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
         BookingDTO result = bookingService.getBookingById(1L);
 
@@ -83,22 +93,31 @@ class BookingServiceTest {
     void createBooking_returnsSavedDTO() {
         BookingDTO dto = new BookingDTO();
         dto.setGuestName("John Doe");
-        dto.setRoomNumber("101");
+        dto.setHotelId(1L);
+        dto.setRoomId(1L);
         dto.setCheckInDate(LocalDate.now().plusDays(1));
         dto.setCheckOutDate(LocalDate.now().plusDays(3));
 
-        Booking savedBooking = new Booking();
-        savedBooking.setId(1L);
-        savedBooking.setGuestName(dto.getGuestName());
-        savedBooking.setRoomNumber(dto.getRoomNumber());
-        savedBooking.setCheckInDate(dto.getCheckInDate());
-        savedBooking.setCheckOutDate(dto.getCheckOutDate());
-
+        Booking savedBooking = createTestBooking();
+        
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(testHotel));
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(testRoom));
         when(bookingRepository.save(any(Booking.class))).thenReturn(savedBooking);
 
         BookingDTO result = bookingService.createBooking(dto);
 
         assertEquals(1L, result.getId());
         assertEquals("John Doe", result.getGuestName());
+    }
+
+    private Booking createTestBooking() {
+        Booking booking = new Booking();
+        booking.setId(1L);
+        booking.setGuestName("John Doe");
+        booking.setHotel(testHotel);
+        booking.setRoom(testRoom);
+        booking.setCheckInDate(LocalDate.now().plusDays(1));
+        booking.setCheckOutDate(LocalDate.now().plusDays(3));
+        return booking;
     }
 }
